@@ -13,7 +13,7 @@ def zip_lists(*lists):
 
     return result
 
-list1 = [1, 2, 3]
+list1 = [1, 2, 3, 8]
 list2 = [5, 6, 7]
 list3 = ["a", "b", "c"]
 
