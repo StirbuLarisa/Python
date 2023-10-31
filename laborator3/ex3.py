@@ -27,14 +27,14 @@ dict1 = {
     "nume": 'ana',
     'ani': 16,
     'adresa': {'oras': 'iasi', 'nr': '12345'},
-    'ore': ['python', 'java'],
+    'ore': [{'oras': 'iasi', 'nr': '12345'},'python', 'java'],
 }
 
 dict2 = {
     'nume': 'ana',
     'ani': 16,
     'adresa': {'oras': 'iasi', 'nr': '12345'},
-    'ore': ['python', 'java'],
+    'ore': [{'oras': 'iasi', 'nr': '12345'},'python', 'java'],
 }
 
 result = compare_dicts(dict1, dict2)
