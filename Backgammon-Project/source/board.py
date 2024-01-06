@@ -2,12 +2,13 @@
 import pygame
 
 class Board :
+
+    BG_COLOR = (255, 255, 255)
     def __init__(self):
         self.screen = pygame.display.set_mode((1920,1080))
-        self.screen.fill((255, 255, 255))
+        self.screen.fill(self.BG_COLOR)
         self.triangles = [[],[]]
-        self.y = 50
-        self.x = 50
+        self.middle_line_width = 100
 
     def generate_board(self):
         up_light_triangle = pygame.image.load("../assets/light-up-row-triangle.png")
@@ -33,14 +34,16 @@ class Board :
 
         self.triangle_width = self.triangles[0][0].get_width()
         self.triangle_height = self.triangles[0][0].get_height()
+        self.y = (self.screen.get_height()/2 - self.triangle_height )/2
+        self.x = (self.screen.get_width() - 12 * self.triangle_width-self.middle_line_width)/2
 
         for index in range (12):
-            if index <6:
+            if index < 6:
                 self.screen.blit(self.triangles[0][index], (self.x + index * self.triangle_width, self.y))
-                self.screen.blit(self.triangles[1][index], (self.x + index * self.triangle_width, self.y+600))
+                self.screen.blit(self.triangles[1][index], (self.x + index * self.triangle_width, self.y+self.triangle_height + 100 ))
             else:
-                self.screen.blit(self.triangles[0][index], (self.x + index * self.triangle_width+100, self.y))
-                self.screen.blit(self.triangles[1][index], (self.x + index * self.triangle_width+100, self.y+600))
+                self.screen.blit(self.triangles[0][index], (self.x + index * self.triangle_width +self.middle_line_width, self.y))
+                self.screen.blit(self.triangles[1][index], (self.x + index * self.triangle_width +self.middle_line_width, self.y+self.triangle_height + 100))
 
         pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect(self.x +6*self.triangle_width +1, 0, 100, 1080))
 
