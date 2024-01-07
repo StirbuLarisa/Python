@@ -1,5 +1,6 @@
 
 class Player:
-    def __init__(self, type):
+    def __init__(self, type, color):
         self.type = type
-        self.pieces = []
+        self.color = color
+        self.removed_pieces = []
