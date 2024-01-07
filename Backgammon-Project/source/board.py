@@ -4,6 +4,7 @@ import pygame
 class Board :
 
     BG_COLOR = (255, 255, 255)
+    BTN_COLOR = (0, 255, 0)
     def __init__(self):
         self.screen = pygame.display.set_mode((1920,1080))
         self.screen.fill(self.BG_COLOR)
@@ -45,6 +46,11 @@ class Board :
                 self.screen.blit(self.triangles[0][index], (self.x + index * self.triangle_width +self.middle_line_width, self.y))
                 self.screen.blit(self.triangles[1][index], (self.x + index * self.triangle_width +self.middle_line_width, self.y+self.triangle_height + 100))
 
-        pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect(self.x +6*self.triangle_width +1, 0, 100, 1080))
+        pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect(self.x +6*self.triangle_width +1, 0, self.middle_line_width, self.screen.get_height()))
+
+        roll_dice_btn = pygame.Rect(0, 0, 100, 50)
+        pygame.draw.rect(self.screen, self.BTN_COLOR, roll_dice_btn)
+
+
 
 
