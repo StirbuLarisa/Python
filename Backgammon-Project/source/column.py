@@ -9,7 +9,7 @@ class Column:
     def update_piece_bounds(self, column_index):
         index = 0
         for piece in self.column_stack:
-            if column_index > 11:
+            if column_index > 12:
                 piece.bounds.x = self.bounds.x + (self.bounds.width - piece.bounds.width)/2
                 piece.bounds.y = self.bounds.y + index * piece.bounds.height
 
