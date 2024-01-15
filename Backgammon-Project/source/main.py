@@ -19,6 +19,6 @@ if __name__ == '__main__':
         elif current_screen == "mode_selection":
             current_screen, selected_mode = game.mode_selection()
             if current_screen == "game_play":
-                game.init_game()
+                game.init_game(selected_mode)
                 game.play()
 
