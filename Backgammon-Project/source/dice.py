@@ -2,11 +2,26 @@ import random
 import pygame
 
 class Dice:
+
+    """
+    This class represents a die in the game. It is used to keep information about the dice and to roll it.
+
+    :ivar sides: The number of sides of the die.
+    :vartype sides: int
+    :ivar value: The value of the die.
+    :vartype value: int
+
+    """
     def __init__(self):
         self.sides = 6
         self.value = 1
 
     def roll(self):
+
+        """
+        Rolls the die and updates its value.
+        :return: None
+        """
 
         self.value = random.randint(1, self.sides)
         self.face = pygame.image.load(f"../assets/dice-face-{self.value}.png")

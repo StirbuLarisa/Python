@@ -6,6 +6,13 @@ from piece import Piece
 
 class Board :
 
+    """
+    The board is the main component of the game.
+    It is responsible for keeping track of the pieces that are placed on it.
+    It also validates the moves that are made by the players, and computes the possible moves for each player.
+    It
+    """
+
     BG_COLOR = pygame.image.load("../assets/bg.jpg")
     BTN_COLOR = (0, 255, 0)
     def __init__(self):
@@ -83,27 +90,49 @@ class Board :
         for index in range(len(self.columns)):
             print(f"Column {index} has {self.columns[index].bounds} bounds")
 
-        self.columns[1].column_stack.extend([Piece("black"),Piece("black")])
-        self.columns[1].update_piece_bounds(1)
-        self.columns[12].column_stack.extend([Piece("black"), Piece("black"), Piece("black"), Piece("black")
+        self.columns[18].column_stack.extend([Piece("black"), Piece("black")])
+        self.columns[18].update_piece_bounds(18)
+        self.columns[20].column_stack.extend([Piece("black"), Piece("black"), Piece("black"), Piece("black")
                                                  , Piece("black")])
-        self.columns[12].update_piece_bounds(12)
-        self.columns[17].column_stack.extend([Piece("black"), Piece("black"), Piece("black")])
-        self.columns[17].update_piece_bounds(17)
-        self.columns[19].column_stack.extend([Piece("black"), Piece("black"), Piece("black"), Piece("black")
+        self.columns[20].update_piece_bounds(20)
+        self.columns[21].column_stack.extend([Piece("black"), Piece("black"), Piece("black")])
+        self.columns[21].update_piece_bounds(21)
+        self.columns[22].column_stack.extend([Piece("black"), Piece("black"), Piece("black"), Piece("black")
                                                  , Piece("black")])
-        self.columns[19].update_piece_bounds(19)
+        self.columns[22].update_piece_bounds(22)
 
-        self.columns[24].column_stack.extend([Piece("white"), Piece("white")])
-        self.columns[24].update_piece_bounds(24)
-        self.columns[13].column_stack.extend([Piece("white"), Piece("white"), Piece("white"), Piece("white")
-                                                 ,Piece("white")])
-        self.columns[13].update_piece_bounds(13)
-        self.columns[8].column_stack.extend([Piece("white"), Piece("white"), Piece("white")])
-        self.columns[8].update_piece_bounds(8)
+        self.columns[4].column_stack.extend([Piece("white"), Piece("white")])
+        self.columns[4].update_piece_bounds(4)
+        self.columns[5].column_stack.extend([Piece("white"), Piece("white"), Piece("white"), Piece("white")
+                                                 , Piece("white")])
+        self.columns[5].update_piece_bounds(5)
+        self.columns[7].column_stack.extend([Piece("white"), Piece("white"), Piece("white")])
+        self.columns[7].update_piece_bounds(7)
         self.columns[6].column_stack.extend([Piece("white"), Piece("white"), Piece("white"), Piece("white"),
                                              Piece("white")])
         self.columns[6].update_piece_bounds(6)
+
+        # self.columns[1].column_stack.extend([Piece("black"),Piece("black")])
+        # self.columns[1].update_piece_bounds(1)
+        # self.columns[12].column_stack.extend([Piece("black"), Piece("black"), Piece("black"), Piece("black")
+        #                                          , Piece("black")])
+        # self.columns[12].update_piece_bounds(12)
+        # self.columns[17].column_stack.extend([Piece("black"), Piece("black"), Piece("black")])
+        # self.columns[17].update_piece_bounds(17)
+        # self.columns[19].column_stack.extend([Piece("black"), Piece("black"), Piece("black"), Piece("black")
+        #                                          , Piece("black")])
+        # self.columns[19].update_piece_bounds(19)
+        #
+        # self.columns[24].column_stack.extend([Piece("white"), Piece("white")])
+        # self.columns[24].update_piece_bounds(24)
+        # self.columns[13].column_stack.extend([Piece("white"), Piece("white"), Piece("white"), Piece("white")
+        #                                          ,Piece("white")])
+        # self.columns[13].update_piece_bounds(13)
+        # self.columns[8].column_stack.extend([Piece("white"), Piece("white"), Piece("white")])
+        # self.columns[8].update_piece_bounds(8)
+        # self.columns[6].column_stack.extend([Piece("white"), Piece("white"), Piece("white"), Piece("white"),
+        #                                      Piece("white")])
+        # self.columns[6].update_piece_bounds(6)
 
         self.draw_pieces(screen)
 
