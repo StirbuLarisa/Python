@@ -101,24 +101,6 @@ class Game:
                 if len(self.dice_values) == 0:
                     self.draw_roll_dice_button(current_player.color)
 
-                if self.all_in_house(current_player):
-                    print(f"all in house {current_player.color}")
-                    for dice in self.dice_values:
-                        if current_player.color == "white":
-                            if not self.board.current_column_is_empty(dice):
-                                if self.board.columns[dice].column_stack[0].color == "white" and len(self.board.columns[dice].column_stack) != 0:
-                                    can_be_removed = True
-                                    break
-                        else:
-                            if not self.board.current_column_is_empty(25-dice):
-                                if self.board.columns[25-dice].column_stack[0].color == "black" and len(self.board.columns[25-dice].column_stack) != 0:
-                                    can_be_removed = True
-                                    break
-                    can_be_removed = False
-                    print(can_be_removed)
-
-                    ##break
-
                 if current_player.removed_pieces != [] and selected_column is None:
                     if (current_player.color == "white"):
                         selected_column = 25
@@ -130,8 +112,6 @@ class Game:
                                                                            selected_column)
                         print(possible_moves)
                         self.board.draw_possible_moves(self.screen, possible_moves)
-
-
 
                 if not possible_moves and len(self.dice_values) != 0 and current_player.removed_pieces != []:
                     print("schimbam jucatorul cand are piesa removed blocata")
@@ -172,35 +152,13 @@ class Game:
                         break
 
                     elif len(self.dice_values) != 0:
+                        if self.check_if_can_remove_piece(selected_column, current_player, self.dice_values):
+                            can_be_removed = True
+                            print(can_be_removed)
 
-                        if (can_be_removed and selected_column is not None):
-                            for index in range(1,len(self.board.columns)-1):
-                                if self.board.columns[index].is_clicked(mouse_pos):
-                                    if current_player.color == "white":
-                                        if index in self.dice_values:
-                                            self.board.columns[index].column_stack.pop()
-                                            self.board.draw_board(self.screen)
-                                            self.board.draw_pieces(self.screen)
-                                            current_player.finished_pieces += 1
-                                            self.draw_dice(current_player.color)
-                                            self.dice_values = []
-                                            selected_column = None
-                                            break
-                                    else:
-                                        if 25-index in self.dice_values:
-                                            self.board.columns[index].column_stack.pop()
-                                            self.board.draw_board(self.screen)
-                                            self.board.draw_pieces(self.screen)
-                                            current_player.finished_pieces += 1
-                                            self.draw_dice(current_player.color)
-                                            self.dice_values = []
-                                            selected_column = None
-                                            break
-                            break
 
                         for index in range(1, len(self.board.columns) - 1):
                             if self.board.columns[index].is_clicked(mouse_pos):
-
 
                                 if selected_column is None and len(
                                         self.board.columns[index].column_stack) != 0 and current_player.color != \
@@ -213,27 +171,133 @@ class Game:
                                     break
 
                                 else:
-                                    if selected_column is None and can_be_removed:
-                                        print(can_be_removed)
-                                        selected_column = index
-                                        break
-                                    elif selected_column is None:
+
+                                    if selected_column is None:
                                         selected_column = index
                                         possible_moves = self.board.compute_possible_moves(current_player,
                                                                                            self.dice_values,
                                                                                            selected_column)
                                         print(possible_moves)
                                         self.board.draw_possible_moves(self.screen, possible_moves)
-                                        if (possible_moves == [] ):
-                                            print("Invalid move")
-                                            selected_column = None
-                                            break
-                                    elif selected_column is not None:
-                                        if (possible_moves == []):
-                                            print("Invalid move")
-                                            selected_column = None
 
+                                        if self.check_if_can_remove_piece(selected_column, current_player, self.dice_values):
+                                            can_be_removed = True
+                                            print(can_be_removed)
                                             break
+
+                                        if (possible_moves == [] and can_be_removed is False ):
+                                            print("Invalid move")
+                                            selected_column = None
+                                            break
+
+                                    elif selected_column is not None:
+                                        print(f" inainte de finish {can_be_removed}")
+                                        if possible_moves == [] and can_be_removed is True:
+                                            print("finish piece")
+                                            current_player.finished_pieces += 1
+                                            self.board.columns[selected_column].column_stack.pop()
+                                            self.board.draw_board(self.screen)
+                                            self.board.draw_pieces(self.screen)
+                                            self.board.draw_removed_pieces(self.screen, self.player1)
+                                            self.board.draw_removed_pieces(self.screen, self.player2)
+                                            if current_player.color == "white":
+                                                if selected_column in self.dice_values:
+                                                    self.dice_values.remove(selected_column)
+                                                else:
+                                                    self.dice_values.remove(max(self.dice_values))
+                                            else:
+                                                if 25-selected_column in self.dice_values:
+                                                    self.dice_values.remove(25-selected_column)
+                                                else:
+                                                    self.dice_values.remove(max(self.dice_values))
+                                            selected_column = None
+                                            if(self.is_winner(current_player)):
+                                                self.draw_winner(current_player)
+
+                                            if self.dice_values == []:
+                                                if current_player == self.player1:
+                                                    current_player = self.player2
+                                                    break
+                                                else:
+                                                    current_player = self.player1
+                                                    break
+                                            else:
+                                                self.draw_dice(current_player.color)
+
+                                        elif possible_moves == [] :
+                                            print("Invalid move")
+                                            selected_column = None
+                                            break
+
+                                        elif possible_moves != [] and can_be_removed is True:
+                                            print("poate sa le faca pe amandoua")
+                                            if index in possible_moves:
+                                                print("in move")
+                                                removed = self.board.move_piece(selected_column, index, self.screen)
+                                                self.draw_dice(current_player.color)
+                                                self.dice_values.remove(abs(selected_column - index))
+                                                possible_moves = []
+
+                                                selected_column = None
+                                                self.board.draw_pieces(self.screen)
+
+                                                if removed is not None:
+                                                    if current_player == self.player1:
+                                                        self.player2.removed_pieces.append(removed)
+                                                        self.board.columns[0].column_stack = self.player2.removed_pieces
+                                                    else:
+                                                        self.player1.removed_pieces.append(removed)
+                                                        self.board.columns[
+                                                            25].column_stack = self.player1.removed_pieces
+
+                                                self.board.draw_removed_pieces(self.screen, self.player1)
+                                                self.board.draw_removed_pieces(self.screen, self.player2)
+
+                                                if len(self.dice_values) == 0:
+                                                    self.board.draw_board(self.screen)
+                                                    self.board.draw_pieces(self.screen)
+                                                    self.board.draw_removed_pieces(self.screen, current_player)
+                                                    if current_player == self.player1:
+                                                        current_player = self.player2
+                                                        self.board.draw_removed_pieces(self.screen, current_player)
+                                                        break
+                                                    else:
+                                                        current_player = self.player1
+                                                        self.board.draw_removed_pieces(self.screen, current_player)
+                                                        break
+                                            elif index == selected_column:
+                                                print("finish piece")
+                                                current_player.finished_pieces += 1
+                                                self.board.columns[selected_column].column_stack.pop()
+                                                self.board.draw_board(self.screen)
+                                                self.board.draw_pieces(self.screen)
+                                                self.board.draw_removed_pieces(self.screen, self.player1)
+                                                self.board.draw_removed_pieces(self.screen, self.player2)
+                                                if current_player.color == "white":
+                                                    if selected_column in self.dice_values:
+                                                        self.dice_values.remove(selected_column)
+                                                    else:
+                                                        self.dice_values.remove(max(self.dice_values))
+                                                else:
+                                                    if 25 - selected_column in self.dice_values:
+                                                        self.dice_values.remove(25 - selected_column)
+                                                    else:
+                                                        self.dice_values.remove(max(self.dice_values))
+                                                selected_column = None
+                                                if (self.is_winner(current_player)):
+                                                    self.draw_winner(current_player)
+
+                                                if self.dice_values == []:
+                                                    if current_player == self.player1:
+                                                        current_player = self.player2
+                                                        break
+                                                    else:
+                                                        current_player = self.player1
+                                                        break
+                                                else:
+                                                    self.draw_dice(current_player.color)
+
+
                                         elif index in possible_moves:
                                             print("in move")
                                             removed = self.board.move_piece(selected_column, index, self.screen)
@@ -267,7 +331,6 @@ class Game:
                                                     current_player = self.player1
                                                     self.board.draw_removed_pieces(self.screen, current_player)
                                                     break
-
 
             pygame.display.flip()
 
@@ -345,16 +408,6 @@ class Game:
         self.screen.blit(self.dice1.face, (self.dice1.dice_rect.x, self.dice1.dice_rect.y))
         self.screen.blit(self.dice2.face, (self.dice2.dice_rect.x, self.dice2.dice_rect.y))
 
-    def put_piece_back_into_play(self, player):
-
-        posible_moves = self.board.compute_possible_moves(player, self.dice_values)
-        if posible_moves is not None:
-            self.board.draw_possible_moves(self.screen, posible_moves)
-        else:
-            self.board.draw_board(self.screen)
-            self.board.draw_pieces(self.screen)
-            self.board.draw_removed_pieces(self.screen, player)
-
     def all_in_house(self, player):
         if player.color == "white":
             for column in self.board.columns[7:24]:
@@ -368,3 +421,50 @@ class Game:
             return True
         else:
             return False
+
+    def check_if_can_remove_piece(self, current_column, player, dice_values):
+        print(current_column)
+        can_remove = True
+        if current_column is None:
+            return False
+        for dice in dice_values:
+            if self.all_in_house(player):
+                if player.color == "white":
+                    if current_column == dice:
+                        if self.board.current_column_is_empty(dice) == False:
+                            if self.board.columns[dice].column_stack[0].color == "white" and len(self.board.columns[dice].column_stack) != 0:
+                                return True
+                    elif current_column < dice:
+                        for index in range(current_column+1, 7):
+                            if self.board.current_column_is_empty(index) == False:
+                                can_remove = False
+                        if can_remove == True:
+                            return can_remove
+                else:
+                    if current_column == 25-dice:
+                        if self.board.current_column_is_empty(25-dice) == False:
+                            if self.board.columns[25-dice].column_stack[0].color == "black" and len(self.board.columns[25-dice].column_stack) != 0:
+                                return True
+                    elif current_column > 25-dice:
+                        for index in range(19, current_column):
+                            if self.board.current_column_is_empty(index) == False:
+                                can_remove = False
+                        if can_remove == True:
+                            return can_remove
+
+        return False
+
+    def is_winner(self, player):
+        if player.finished_pieces == 15:
+            return True
+        else:
+            return False
+
+    def draw_winner(self, player):
+        rect = pygame.Rect(self.screen.get_width()/2 - self.screen.get_width()/4, self.screen.get_height()/2-self.screen.get_height()/8, self.screen.get_width()/2, self.screen.get_height()/4)
+        pygame.draw.rect(self.screen, (255, 255, 255), rect)
+        self.draw_text(f"{player.color} player won!", rect.x + 160 , rect.y + 80, (0, 0, 0), self.title_font)
+        pygame.display.flip()
+        time.sleep(8)
+        pygame.quit()
+        sys.exit()
