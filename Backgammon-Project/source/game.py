@@ -1,3 +1,4 @@
+import random
 import sys
 import time
 
@@ -56,7 +57,7 @@ class Game:
 
     def init_game(self, mode):
         self.board.init_board(self.screen)
-        self.player1 = Player( "human", "white")
+        self.player1 = Player("human", "white")
         if mode == "pvp":
             self.player2 = Player("human", "black")
         else:
@@ -97,15 +98,65 @@ class Game:
 
     def play(self):
         current_player = self.player1
-
         selected_column = None
         possible_moves = []
+
         while True:
             for event in pygame.event.get():
-
                 can_be_removed = False
                 if len(self.dice_values) == 0:
                     self.draw_roll_dice_button(current_player.color)
+
+                if current_player.type == "pc":
+                    self.roll_dice(current_player.color)
+                    pygame.time.delay(1000)
+                    self.draw_dice(current_player.color)
+                    pygame.display.flip()
+                    print(self.dice_values)
+
+                    while self.dice_values:
+                        print(self.dice_values)
+
+                        if current_player.removed_pieces:
+                            selected_column = 0
+                            possible_moves = self.board.compute_possible_moves(current_player, self.dice_values,
+                                                                               selected_column)
+                            if len(possible_moves) == 0:
+                                selected_column = None
+                                break
+                            move_index = random.randint(0, len(possible_moves) - 1)
+                            move = possible_moves[move_index]
+                            self.handle_move(current_player, move, selected_column)
+                            selected_column = None
+                            continue
+
+                        can_move, possible_indices = self.check_if_player_cannot_move(current_player)
+                        print(possible_indices)
+                        if can_move == False:
+                            current_player = self.reset_current_player(current_player)
+                            break
+
+                        move_index = random.randint(0, len(possible_indices) - 1)
+                        move = possible_indices[move_index]
+
+                        if move[0] != move[1]:
+                            self.handle_move(current_player, move[1], move[0])
+                        else:
+                            self.finish_piece(current_player, move[0])
+
+                        if self.is_winner(current_player):
+                            self.draw_winner(current_player)
+                            pygame.display.flip()
+                        else:
+                            self.board.draw_board(self.screen)
+                            self.board.draw_pieces(self.screen)
+                            self.board.draw_removed_pieces(self.screen, self.player1)
+                            self.board.draw_removed_pieces(self.screen, self.player2)
+                            self.draw_dice(current_player.color)
+                            pygame.display.flip()
+                            pygame.time.delay(1000)
+                    current_player = self.reset_current_player(current_player)
+                    break
 
                 if current_player.removed_pieces != [] and selected_column is None:
                     if current_player.color == "white":
@@ -141,21 +192,23 @@ class Game:
                     self.board.handle_column_click(mouse_pos)
 
                     if self.roll_dice_button_is_clicked(mouse_pos):
-                        self.roll_dice(current_player.color)
-                        print(self.dice_values)
+                        if len(self.dice_values) == 0:
+                            self.roll_dice(current_player.color)
+                            self.draw_dice(current_player.color)
+                            print(self.dice_values)
 
-                        can_move, possible_indices = self.check_if_player_cannot_move(current_player)
-                        if can_move == False:
-                            self.reset_if_player_cannot_move(current_player)
-                            selected_column = None
+                            can_move, possible_indices = self.check_if_player_cannot_move(current_player)
+                            if can_move == False:
+                                current_player = self.reset_current_player(current_player)
+                                selected_column = None
+                                break
+
+                            if selected_column is not None:
+                                possible_moves = self.board.compute_possible_moves(current_player, self.dice_values,
+                                                                                   selected_column)
+                                print(possible_moves)
+                                self.board.draw_possible_moves(self.screen, possible_moves)
                             break
-
-                        if selected_column is not None:
-                            possible_moves = self.board.compute_possible_moves(current_player, self.dice_values,
-                                                                               selected_column)
-                            print(possible_moves)
-                            self.board.draw_possible_moves(self.screen, possible_moves)
-                        break
 
                     elif len(self.dice_values) != 0:
                         if self.check_if_can_remove_piece(selected_column, current_player, self.dice_values):
@@ -206,7 +259,7 @@ class Game:
                                             can_move, possible_indices = self.check_if_player_cannot_move(
                                                 current_player)
                                             if len(self.dice_values) != 0 and can_move == False:
-                                                self.reset_if_player_cannot_move(current_player)
+                                                current_player = self.reset_current_player(current_player)
                                                 selected_column = None
                                                 break
                                             selected_column = None
@@ -236,7 +289,7 @@ class Game:
                                                 can_move, possible_indices = self.check_if_player_cannot_move(
                                                     current_player)
                                                 if len(self.dice_values) != 0 and can_move == False:
-                                                    self.reset_if_player_cannot_move(current_player)
+                                                    current_player = self.reset_current_player(current_player)
                                                     selected_column = None
                                                     break
 
@@ -255,7 +308,7 @@ class Game:
                                                 can_move, possible_indices = self.check_if_player_cannot_move(
                                                     current_player)
                                                 if len(self.dice_values) != 0 and can_move == False:
-                                                    self.reset_if_player_cannot_move(current_player)
+                                                    current_player = self.reset_current_player(current_player)
                                                     selected_column = None
                                                     break
                                                 selected_column = None
@@ -278,7 +331,7 @@ class Game:
                                             can_move, possible_indices = self.check_if_player_cannot_move(
                                                 current_player)
                                             if len(self.dice_values) != 0 and can_move == False:
-                                                self.reset_if_player_cannot_move(current_player)
+                                                current_player = self.reset_current_player(current_player)
                                                 selected_column = None
                                                 break
 
@@ -292,31 +345,33 @@ class Game:
 
             pygame.display.flip()
 
-
-    def reset_if_player_cannot_move(self, current_player):
+    def reset_current_player(self, current_player):
         time.sleep(3)
-        self.change_player(current_player)
+        current_player = self.change_player(current_player)
         self.board.draw_board(self.screen)
         self.board.draw_pieces(self.screen)
         self.board.draw_removed_pieces(self.screen, self.player1)
         self.board.draw_removed_pieces(self.screen, self.player2)
         self.dice_values = []
+        return current_player
 
-    def check_if_player_cannot_move(self, current_player):
+    def check_if_player_cannot_move(self, current_player, current_column=None):
         can_move = False
         possible_indices = []
+
         if self.all_in_house(current_player):
             if current_player.color == "white":
                 for index in range(1, 7):
-                    if self.check_if_can_remove_piece(index, current_player, self.dice_values):
-                        possible_indices.append((index, index))
-                        can_move = True
-
+                    if not self.board.current_column_is_empty(index):
+                        if self.check_if_can_remove_piece(index, current_player, self.dice_values):
+                            possible_indices.append((index, index))
+                            can_move = True
             else:
                 for index in range(19, 25):
-                    if self.check_if_can_remove_piece(index, current_player, self.dice_values):
-                        possible_indices.append((index, index))
-                        can_move = True
+                    if not self.board.current_column_is_empty(index):
+                        if self.check_if_can_remove_piece(index, current_player, self.dice_values):
+                            possible_indices.append((index, index))
+                            can_move = True
 
         for index in range(1, len(self.board.columns) - 1):
             if self.board.current_column_is_empty(index) == False:
@@ -340,13 +395,13 @@ class Game:
         selected_column = None
         self.board.draw_pieces(self.screen)
         if removed is not None:
-
             if current_player == self.player1:
                 self.player2.removed_pieces.append(removed)
                 self.board.columns[0].column_stack = self.player2.removed_pieces
             else:
                 self.player1.removed_pieces.append(removed)
                 self.board.columns[25].column_stack = self.player1.removed_pieces
+
         self.board.draw_removed_pieces(self.screen, self.player1)
         self.board.draw_removed_pieces(self.screen, self.player2)
         return possible_moves, selected_column
@@ -483,7 +538,8 @@ class Game:
                     elif current_column < dice:
                         for index in range(current_column + 1, 7):
                             if self.board.current_column_is_empty(index) == False:
-                                can_remove = False
+                                if self.board.columns[index].column_stack[0].color != "black":
+                                    can_remove = False
                         if can_remove == True:
                             return can_remove
                 else:
@@ -495,10 +551,10 @@ class Game:
                     elif current_column > 25 - dice:
                         for index in range(19, current_column):
                             if self.board.current_column_is_empty(index) == False:
-                                can_remove = False
+                                if self.board.columns[index].column_stack[0].color != "white":
+                                    can_remove = False
                         if can_remove == True:
                             return can_remove
-
         return False
 
     def is_winner(self, player):
