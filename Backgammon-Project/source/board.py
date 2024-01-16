@@ -47,6 +47,7 @@ class Board:
     def generate_board(self, screen):
         """
         Generates the board. It creates the triangles and init the bounds of the triangles.
+
         :param screen: The screen of the game.
         :type screen: pygame.Surface
         :return: None
@@ -97,6 +98,7 @@ class Board:
     def draw_board(self, screen):
         """
         Draws the board on the screen.
+
         :param screen: The screen of the game.
         :type screen: pygame.Surface
         :return: None
@@ -119,6 +121,7 @@ class Board:
     def assign_columns(self):
         """
         Assigns the columns to the board.
+
         :return: None
         """
 
@@ -133,6 +136,7 @@ class Board:
         """
         Initializes the board. It generates the board, draws it on the screen and assigns the columns to the board.
         It also draws the pieces on the screen.
+
         :param screen: The screen of the game.
         :type screen: pygame.Surface
         :return: None

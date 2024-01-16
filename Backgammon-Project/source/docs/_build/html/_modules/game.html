@@ -135,6 +135,7 @@
     <span class="k">def</span> <span class="nf">init_game</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the game. It chose the type of the second player based on the mode. It also initializes the board.</span>
+
 <span class="sd">        :param mode: The mode of the game. It can be either &quot;pvp&quot; (2 players) or &quot;pvc&quot; (player vs computer).</span>
 <span class="sd">        :type mode: str</span>
 <span class="sd">        :return: None</span>
@@ -461,6 +462,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Resets the current player. It draws the board and the pieces and resets the dice values. It also changes the</span>
 <span class="sd">        current player.</span>
+
 <span class="sd">        :param current_player: The current player.</span>
 <span class="sd">        :type current_player: Player</span>
 <span class="sd">        :return: The new current player.</span>
@@ -534,6 +536,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Handles the move of the piece. It moves the piece from the selected column to the index column. It also removes</span>
 <span class="sd">        the piece if the piece is eaten. It returns the possible moves and the selected column.</span>
+
 <span class="sd">        :param current_player: The current player.</span>
 <span class="sd">        :type current_player: Player</span>
 <span class="sd">        :param index: The index of the column to which the piece is moved.</span>
@@ -598,6 +601,7 @@
     <span class="k">def</span> <span class="nf">change_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_player</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Changes the current player.</span>
+
 <span class="sd">        :param current_player: The current player.</span>
 <span class="sd">        :type current_player: Player</span>
 <span class="sd">        :return: The new current player.</span>
@@ -615,6 +619,7 @@
     <span class="k">def</span> <span class="nf">draw_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">txt_font</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draws the text on the screen.</span>
+
 <span class="sd">        :param text: The text to be drawn.</span>
 <span class="sd">        :type text: str</span>
 <span class="sd">        :param x: The x coordinate of the text.</span>
@@ -637,6 +642,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The mode selection loop. It draws the mode selection menu and handles the user&#39;s clicks. It returns the next</span>
 <span class="sd">        state of the game (the actual game) and the selected mode.</span>
+
 <span class="sd">        :return: The next state of the game and the selected mode.</span>
 <span class="sd">        :rtype: tuple (str, str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -678,6 +684,7 @@
     <span class="k">def</span> <span class="nf">draw_roll_dice_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_color</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draws the roll dice button.</span>
+
 <span class="sd">        :param player_color: The color of the player.</span>
 <span class="sd">        :type player_color: str</span>
 <span class="sd">        :return: None</span>
@@ -698,6 +705,7 @@
     <span class="k">def</span> <span class="nf">roll_dice_button_is_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mouse_pos</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if the roll dice button is clicked.</span>
+
 <span class="sd">        :param mouse_pos: The position of the mouse.</span>
 <span class="sd">        :type mouse_pos: tuple</span>
 <span class="sd">        :return: True if the roll dice button is clicked, False otherwise.</span>
@@ -711,6 +719,7 @@
     <span class="k">def</span> <span class="nf">roll_dice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_color</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rolls the dice and updates the dice values. It also draws the dice.</span>
+
 <span class="sd">        :param player_color: The color of the player.</span>
 <span class="sd">        :type player_color: str</span>
 <span class="sd">        :return: None</span>
@@ -730,6 +739,7 @@
     <span class="k">def</span> <span class="nf">draw_dice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_color</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draws the dice.</span>
+
 <span class="sd">        :param player_color: The color of the player.</span>
 <span class="sd">        :type player_color: str</span>
 <span class="sd">        :return: None</span>
@@ -755,7 +765,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if all the pieces of the player are in the house. It checks if all the pieces of the same color are in</span>
 <span class="sd">        their home.</span>
-<span class="sd">        False.</span>
+
 <span class="sd">        :param player: The player.</span>
 <span class="sd">        :type player: Player</span>
 <span class="sd">        :return: True if all the pieces of the player are in the house, False otherwise.</span>
@@ -832,6 +842,7 @@
     <span class="k">def</span> <span class="nf">is_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if the player is the winner.</span>
+
 <span class="sd">        :param player: The player.</span>
 <span class="sd">        :type player: Player</span>
 <span class="sd">        :return: True if the player is the winner, False otherwise.</span>
@@ -848,6 +859,7 @@
     <span class="k">def</span> <span class="nf">draw_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draws the winner on the screen.</span>
+
 <span class="sd">        :param player: The player that won</span>
 <span class="sd">        :type player: Player</span>
 <span class="sd">        :return: None</span>

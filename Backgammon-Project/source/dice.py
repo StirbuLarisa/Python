@@ -27,6 +27,7 @@ class Dice:
 
         """
         Rolls the die and updates its value.
+
         :return: None
         """
         self.value = random.randint(1, self.sides)

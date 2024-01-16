@@ -23,6 +23,7 @@ class Column:
 
         """
         Updates the bounds of the pieces that are placed on the column.
+
         :param column_index: The index of the column.
         :return: None
         """
@@ -41,6 +42,7 @@ class Column:
     def is_clicked(self, mouse_pos):
         """
         Checks if the column is clicked.
+
         :param mouse_pos: The position of the mouse.
         :type mouse_pos: tuple
         :return: True if the column is clicked, False otherwise.

@@ -58,6 +58,7 @@ class Game:
     def init_game(self, mode):
         """
         Initializes the game. It chose the type of the second player based on the mode. It also initializes the board.
+
         :param mode: The mode of the game. It can be either "pvp" (2 players) or "pvc" (player vs computer).
         :type mode: str
         :return: None
@@ -375,6 +376,7 @@ class Game:
         """
         Resets the current player. It draws the board and the pieces and resets the dice values. It also changes the
         current player.
+
         :param current_player: The current player.
         :type current_player: Player
         :return: The new current player.
@@ -442,6 +444,7 @@ class Game:
         """
         Handles the move of the piece. It moves the piece from the selected column to the index column. It also removes
         the piece if the piece is eaten. It returns the possible moves and the selected column.
+
         :param current_player: The current player.
         :type current_player: Player
         :param index: The index of the column to which the piece is moved.
@@ -500,6 +503,7 @@ class Game:
     def change_player(self, current_player):
         """
         Changes the current player.
+
         :param current_player: The current player.
         :type current_player: Player
         :return: The new current player.
@@ -514,6 +518,7 @@ class Game:
     def draw_text(self, text, x, y, color, txt_font):
         """
         Draws the text on the screen.
+
         :param text: The text to be drawn.
         :type text: str
         :param x: The x coordinate of the text.
@@ -533,6 +538,7 @@ class Game:
         """
         The mode selection loop. It draws the mode selection menu and handles the user's clicks. It returns the next
         state of the game (the actual game) and the selected mode.
+
         :return: The next state of the game and the selected mode.
         :rtype: tuple (str, str)
         """
@@ -571,6 +577,7 @@ class Game:
     def draw_roll_dice_button(self, player_color):
         """
         Draws the roll dice button.
+
         :param player_color: The color of the player.
         :type player_color: str
         :return: None
@@ -588,6 +595,7 @@ class Game:
     def roll_dice_button_is_clicked(self, mouse_pos):
         """
         Checks if the roll dice button is clicked.
+
         :param mouse_pos: The position of the mouse.
         :type mouse_pos: tuple
         :return: True if the roll dice button is clicked, False otherwise.
@@ -598,6 +606,7 @@ class Game:
     def roll_dice(self, player_color):
         """
         Rolls the dice and updates the dice values. It also draws the dice.
+
         :param player_color: The color of the player.
         :type player_color: str
         :return: None
@@ -614,6 +623,7 @@ class Game:
     def draw_dice(self, player_color):
         """
         Draws the dice.
+
         :param player_color: The color of the player.
         :type player_color: str
         :return: None
@@ -636,7 +646,7 @@ class Game:
         """
         Checks if all the pieces of the player are in the house. It checks if all the pieces of the same color are in
         their home.
-        False.
+
         :param player: The player.
         :type player: Player
         :return: True if all the pieces of the player are in the house, False otherwise.
@@ -707,6 +717,7 @@ class Game:
     def is_winner(self, player):
         """
         Checks if the player is the winner.
+
         :param player: The player.
         :type player: Player
         :return: True if the player is the winner, False otherwise.
@@ -720,6 +731,7 @@ class Game:
     def draw_winner(self, player):
         """
         Draws the winner on the screen.
+
         :param player: The player that won
         :type player: Player
         :return: None

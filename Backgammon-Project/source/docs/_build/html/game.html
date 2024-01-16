@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="main module" href="main.html" />
+    <link rel="next" title="piece module" href="piece.html" />
     <link rel="prev" title="dice module" href="dice.html" /> 
 </head>
 
@@ -74,7 +74,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="piece.html">piece module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="player.html">player module</a></li>
 </ul>
@@ -119,7 +118,7 @@ It also handles the game’s menu loop.</p>
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>screen</strong> (<em>pygame.Surface</em>) – The screen on which the menu and the game is drawn.</p></li>
-<li><p><strong>board</strong> (<em>Board</em>) – The board on which the game is played.</p></li>
+<li><p><strong>board</strong> (<a class="reference internal" href="board.html#board.Board" title="board.Board"><em>Board</em></a>) – The board on which the game is played.</p></li>
 <li><p><strong>player1</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The first player. Always white, always human.</p></li>
 <li><p><strong>player2</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The second player. Always black, can be human or computer.</p></li>
 <li><p><strong>dice1</strong> (<a class="reference internal" href="dice.html#dice.Dice" title="dice.Dice"><em>Dice</em></a>) – The first dice.</p></li>
@@ -137,22 +136,35 @@ It also handles the game’s menu loop.</p>
 <dt class="sig sig-object py" id="game.Game.all_in_house">
 <span class="sig-name descname"><span class="pre">all_in_house</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.all_in_house"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.all_in_house" title="Link to this definition"></a></dt>
 <dd><p>Checks if all the pieces of the player are in the house. It checks if all the pieces of the same color are in
-their home.
-False.
-:param player: The player.
-:type player: Player
-:return: True if all the pieces of the player are in the house, False otherwise.
-:rtype: bool</p>
+their home.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all the pieces of the player are in the house, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.change_player">
 <span class="sig-name descname"><span class="pre">change_player</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.change_player"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.change_player" title="Link to this definition"></a></dt>
-<dd><p>Changes the current player.
-:param current_player: The current player.
-:type current_player: Player
-:return: The new current player.
-:rtype: Player</p>
+<dd><p>Changes the current player.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_player</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The current player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new current player.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="player.html#player.Player" title="player.Player">Player</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -209,45 +221,63 @@ move a piece from the house. If the player cannot move a piece from the house, i
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.draw_dice">
 <span class="sig-name descname"><span class="pre">draw_dice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.draw_dice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.draw_dice" title="Link to this definition"></a></dt>
-<dd><p>Draws the dice.
-:param player_color: The color of the player.
-:type player_color: str
-:return: None</p>
+<dd><p>Draws the dice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player_color</strong> (<em>str</em>) – The color of the player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.draw_roll_dice_button">
 <span class="sig-name descname"><span class="pre">draw_roll_dice_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.draw_roll_dice_button"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.draw_roll_dice_button" title="Link to this definition"></a></dt>
-<dd><p>Draws the roll dice button.
-:param player_color: The color of the player.
-:type player_color: str
-:return: None</p>
+<dd><p>Draws the roll dice button.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player_color</strong> (<em>str</em>) – The color of the player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.draw_text">
 <span class="sig-name descname"><span class="pre">draw_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt_font</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.draw_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.draw_text" title="Link to this definition"></a></dt>
-<dd><p>Draws the text on the screen.
-:param text: The text to be drawn.
-:type text: str
-:param x: The x coordinate of the text.
-:type x: int
-:param y: The y coordinate of the text.
-:type y: int
-:param color: The color of the text.
-:type color: tuple
-:param txt_font: The font of the text.
-:type txt_font: pygame.font.Font
-:return: None</p>
+<dd><p>Draws the text on the screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be drawn.</p></li>
+<li><p><strong>x</strong> (<em>int</em>) – The x coordinate of the text.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y coordinate of the text.</p></li>
+<li><p><strong>color</strong> (<em>tuple</em>) – The color of the text.</p></li>
+<li><p><strong>txt_font</strong> (<em>pygame.font.Font</em>) – The font of the text.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.draw_winner">
 <span class="sig-name descname"><span class="pre">draw_winner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.draw_winner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.draw_winner" title="Link to this definition"></a></dt>
-<dd><p>Draws the winner on the screen.
-:param player: The player that won
-:type player: Player
-:return: None</p>
+<dd><p>Draws the winner on the screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The player that won</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -272,34 +302,53 @@ It also draws the board and the pieces.</p>
 <dt class="sig sig-object py" id="game.Game.handle_move">
 <span class="sig-name descname"><span class="pre">handle_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.handle_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.handle_move" title="Link to this definition"></a></dt>
 <dd><p>Handles the move of the piece. It moves the piece from the selected column to the index column. It also removes
-the piece if the piece is eaten. It returns the possible moves and the selected column.
-:param current_player: The current player.
-:type current_player: Player
-:param index: The index of the column to which the piece is moved.
-:type index: int
-:param selected_column: The index of the column from which the piece is moved.
-:type selected_column: int
-:return: The possible moves and the selected column.
-:rtype: tuple (list, int or None)</p>
+the piece if the piece is eaten. It returns the possible moves and the selected column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_player</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The current player.</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – The index of the column to which the piece is moved.</p></li>
+<li><p><strong>selected_column</strong> (<em>int</em>) – The index of the column from which the piece is moved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The possible moves and the selected column.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple (list, int or None)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.init_game">
 <span class="sig-name descname"><span class="pre">init_game</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.init_game"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.init_game" title="Link to this definition"></a></dt>
-<dd><p>Initializes the game. It chose the type of the second player based on the mode. It also initializes the board.
-:param mode: The mode of the game. It can be either “pvp” (2 players) or “pvc” (player vs computer).
-:type mode: str
-:return: None</p>
+<dd><p>Initializes the game. It chose the type of the second player based on the mode. It also initializes the board.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>) – The mode of the game. It can be either “pvp” (2 players) or “pvc” (player vs computer).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.is_winner">
 <span class="sig-name descname"><span class="pre">is_winner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.is_winner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.is_winner" title="Link to this definition"></a></dt>
-<dd><p>Checks if the player is the winner.
-:param player: The player.
-:type player: Player
-:return: True if the player is the winner, False otherwise.
-:rtype: bool</p>
+<dd><p>Checks if the player is the winner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the player is the winner, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -322,9 +371,15 @@ will enter the mode selection loop, where the player can choose the game mode.</
 <dt class="sig sig-object py" id="game.Game.mode_selection">
 <span class="sig-name descname"><span class="pre">mode_selection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.mode_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.mode_selection" title="Link to this definition"></a></dt>
 <dd><p>The mode selection loop. It draws the mode selection menu and handles the user’s clicks. It returns the next
-state of the game (the actual game) and the selected mode.
-:return: The next state of the game and the selected mode.
-:rtype: tuple (str, str)</p>
+state of the game (the actual game) and the selected mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The next state of the game and the selected mode.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple (str, str)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -347,30 +402,49 @@ In case of a computer player it rolls the dice, computes all possible moves and 
 <dt class="sig sig-object py" id="game.Game.reset_current_player">
 <span class="sig-name descname"><span class="pre">reset_current_player</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.reset_current_player"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.reset_current_player" title="Link to this definition"></a></dt>
 <dd><p>Resets the current player. It draws the board and the pieces and resets the dice values. It also changes the
-current player.
-:param current_player: The current player.
-:type current_player: Player
-:return: The new current player.
-:rtype: Player</p>
+current player.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_player</strong> (<a class="reference internal" href="player.html#player.Player" title="player.Player"><em>Player</em></a>) – The current player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new current player.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="player.html#player.Player" title="player.Player">Player</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.roll_dice">
 <span class="sig-name descname"><span class="pre">roll_dice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.roll_dice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.roll_dice" title="Link to this definition"></a></dt>
-<dd><p>Rolls the dice and updates the dice values. It also draws the dice.
-:param player_color: The color of the player.
-:type player_color: str
-:return: None</p>
+<dd><p>Rolls the dice and updates the dice values. It also draws the dice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player_color</strong> (<em>str</em>) – The color of the player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="game.Game.roll_dice_button_is_clicked">
 <span class="sig-name descname"><span class="pre">roll_dice_button_is_clicked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mouse_pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game.html#Game.roll_dice_button_is_clicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game.Game.roll_dice_button_is_clicked" title="Link to this definition"></a></dt>
-<dd><p>Checks if the roll dice button is clicked.
-:param mouse_pos: The position of the mouse.
-:type mouse_pos: tuple
-:return: True if the roll dice button is clicked, False otherwise.
-:rtype: bool</p>
+<dd><p>Checks if the roll dice button is clicked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mouse_pos</strong> (<em>tuple</em>) – The position of the mouse.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the roll dice button is clicked, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -382,7 +456,7 @@ current player.
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="dice.html" class="btn btn-neutral float-left" title="dice module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="main.html" class="btn btn-neutral float-right" title="main module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="piece.html" class="btn btn-neutral float-right" title="piece module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
