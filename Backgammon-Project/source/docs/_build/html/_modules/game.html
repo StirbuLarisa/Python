@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>game &mdash; Backgammon 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Backgammon
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">source</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Backgammon</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">game</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for game</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">pygame</span>
+
+<span class="kn">from</span> <span class="nn">player</span> <span class="kn">import</span> <span class="n">Player</span>
+<span class="kn">from</span> <span class="nn">dice</span> <span class="kn">import</span> <span class="n">Dice</span>
+
+
+<div class="viewcode-block" id="Game">
+<a class="viewcode-back" href="../game.html#game.Game">[docs]</a>
+<span class="k">class</span> <span class="nc">Game</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is responsible for most of the game logic.</span>
+<span class="sd">    It initializes the game, draws the board, handles the player&#39;s clicks, etc.</span>
+<span class="sd">    It also handles the game&#39;s menu loop.</span>
+
+<span class="sd">    :ivar screen: The screen on which the menu and the game is drawn.</span>
+<span class="sd">    :vartype screen: pygame.Surface</span>
+<span class="sd">    :ivar board: The board on which the game is played.</span>
+<span class="sd">    :vartype board: Board</span>
+<span class="sd">    :ivar player1: The first player. Always white, always human.</span>
+<span class="sd">    :vartype player1: Player</span>
+<span class="sd">    :ivar player2: The second player. Always black, can be human or computer.</span>
+<span class="sd">    :vartype player2: Player</span>
+<span class="sd">    :ivar dice1: The first dice.</span>
+<span class="sd">    :vartype dice1: Dice</span>
+<span class="sd">    :ivar dice2: The second dice.</span>
+<span class="sd">    :vartype dice2: Dice</span>
+<span class="sd">    :ivar roll_dice_button: The button that rolls the dice.</span>
+<span class="sd">    :vartype roll_dice_button: pygame.Surface</span>
+<span class="sd">    :ivar roll_dice_button_rect: The rectangle that contains the roll_dice_button.</span>
+<span class="sd">    :vartype roll_dice_button_rect: pygame.Rect</span>
+<span class="sd">    :ivar dice_values: The values of the dice.</span>
+<span class="sd">    :vartype dice_values: list</span>
+<span class="sd">    :ivar font: The font used for the text.</span>
+<span class="sd">    :vartype font: pygame.font.Font</span>
+<span class="sd">    :ivar title_font: The font used for the title.</span>
+<span class="sd">    :vartype title_font: pygame.font.Font</span>
+<span class="sd">    :ivar menu_background: The background image of the menu.</span>
+<span class="sd">    :vartype menu_background: pygame.Surface</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">screen</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">set_mode</span><span class="p">((</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">))</span>
+        <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">set_caption</span><span class="p">(</span><span class="s2">&quot;Backgammon&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">board</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player1</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player2</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">font</span><span class="o">.</span><span class="n">Font</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">36</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_font</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">font</span><span class="o">.</span><span class="n">Font</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_background</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../assets/wallpaper_menu.jpg&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Game.init_game">
+<a class="viewcode-back" href="../game.html#game.Game.init_game">[docs]</a>
+    <span class="k">def</span> <span class="nf">init_game</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the game. It chose the type of the second player based on the mode. It also initializes the board.</span>
+<span class="sd">        :param mode: The mode of the game. It can be either &quot;pvp&quot; (2 players) or &quot;pvc&quot; (player vs computer).</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">init_board</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player1</span> <span class="o">=</span> <span class="n">Player</span><span class="p">(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;pvp&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">player2</span> <span class="o">=</span> <span class="n">Player</span><span class="p">(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">player2</span> <span class="o">=</span> <span class="n">Player</span><span class="p">(</span><span class="s2">&quot;pc&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Game.main_menu">
+<a class="viewcode-back" href="../game.html#game.Game.main_menu">[docs]</a>
+    <span class="k">def</span> <span class="nf">main_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The main menu loop. It draws the main menu and handles the user&#39;s clicks. It returns the next state of the game.</span>
+<span class="sd">        The player can choose to play the game or to quit the game. If the player chooses to play the game, the game</span>
+<span class="sd">        will enter the mode selection loop, where the player can choose the game mode.</span>
+
+<span class="sd">        :return: The next state of the game.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rect_width</span><span class="p">,</span> <span class="n">rect_height</span> <span class="o">=</span> <span class="mi">550</span><span class="p">,</span> <span class="mi">500</span>
+        <span class="n">transparent_surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="n">rect_width</span><span class="p">,</span> <span class="n">rect_height</span><span class="p">),</span> <span class="n">pygame</span><span class="o">.</span><span class="n">SRCALPHA</span><span class="p">)</span>
+        <span class="n">transparent_surface</span><span class="o">.</span><span class="n">fill</span><span class="p">((</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">150</span><span class="p">))</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_background</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="n">transparent_surface</span><span class="p">,</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">250</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">4</span> <span class="o">-</span> <span class="mi">50</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="s2">&quot;Backgammon&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">200</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">title_font</span><span class="p">)</span>
+
+            <span class="n">play_button</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">50</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="n">pygame</span><span class="o">.</span><span class="n">draw</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">play_button</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="s2">&quot;Play&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">26</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span>
+                           <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">)</span>
+
+            <span class="n">quit_button</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">50</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="n">pygame</span><span class="o">.</span><span class="n">draw</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">quit_button</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="s2">&quot;Quit&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">26</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">42</span><span class="p">,</span>
+                           <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pygame</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">QUIT</span><span class="p">:</span>
+                    <span class="n">pygame</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">MOUSEBUTTONDOWN</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">play_button</span><span class="o">.</span><span class="n">collidepoint</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="s2">&quot;mode_selection&quot;</span>
+                    <span class="k">elif</span> <span class="n">quit_button</span><span class="o">.</span><span class="n">collidepoint</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">):</span>
+                        <span class="n">pygame</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Game.play">
+<a class="viewcode-back" href="../game.html#game.Game.play">[docs]</a>
+    <span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The game loop. It draws the board, the pieces and the removed pieces. It has the logic for both human and</span>
+<span class="sd">        computer players. It also handles the player&#39;s clicks.</span>
+<span class="sd">        It checks if the player can move. If the player cannot move, it changes the current player.</span>
+<span class="sd">        It checks if the player can put a piece back on board. If not, it changes the current player.</span>
+<span class="sd">        It checks if the player is the winner. If the player is the winner, it draws the winner.</span>
+<span class="sd">        In case of a computer player it rolls the dice, computes all possible moves and chooses a random move.</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span>
+        <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">possible_moves</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pygame</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+
+                <span class="n">can_be_removed</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">draw_roll_dice_button</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+
+                <span class="c1"># this part is the logic for the computer player</span>
+                <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;pc&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                    <span class="n">pygame</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                    <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+
+                    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">:</span>
+
+                        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">removed_pieces</span><span class="p">:</span>
+                            <span class="n">selected_column</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="n">possible_moves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">compute_possible_moves</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">,</span>
+                                                                               <span class="n">selected_column</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_moves</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                <span class="k">break</span>
+                            <span class="n">move_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_moves</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="n">move</span> <span class="o">=</span> <span class="n">possible_moves</span><span class="p">[</span><span class="n">move_index</span><span class="p">]</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">handle_move</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="n">move</span><span class="p">,</span> <span class="n">selected_column</span><span class="p">)</span>
+                            <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">continue</span>
+
+                        <span class="n">can_move</span><span class="p">,</span> <span class="n">possible_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_player_cannot_move</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">can_move</span><span class="p">:</span>
+                            <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_current_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                            <span class="k">break</span>
+
+                        <span class="n">move_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">move</span> <span class="o">=</span> <span class="n">possible_indices</span><span class="p">[</span><span class="n">move_index</span><span class="p">]</span>
+
+                        <span class="k">if</span> <span class="n">move</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">move</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">handle_move</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="n">move</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">move</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">finish_piece</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="n">move</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_winner</span><span class="p">(</span><span class="n">current_player</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">draw_winner</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                            <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_board</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                            <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+                            <span class="n">pygame</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+                    <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_current_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># this part is the logic for the human player</span>
+                <span class="c1"># it checks if the player can go back on board</span>
+                <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">removed_pieces</span> <span class="o">!=</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">selected_column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
+                        <span class="n">selected_column</span> <span class="o">=</span> <span class="mi">25</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">selected_column</span> <span class="o">=</span> <span class="mi">0</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span> <span class="o">!=</span> <span class="p">[]:</span>
+                        <span class="n">possible_moves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">compute_possible_moves</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">,</span>
+                                                                           <span class="n">selected_column</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_possible_moves</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="n">possible_moves</span><span class="p">)</span>
+
+                <span class="c1"># the eaten piece cannot be put back on board and the player has to change</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">possible_moves</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_player</span><span class="o">.</span><span class="n">removed_pieces</span> <span class="o">!=</span> <span class="p">[]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                    <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_board</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">break</span>
+
+                <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">QUIT</span><span class="p">:</span>
+                    <span class="n">pygame</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">MOUSEBUTTONDOWN</span><span class="p">:</span>
+                    <span class="n">mouse_pos</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">mouse</span><span class="o">.</span><span class="n">get_pos</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">handle_column_click</span><span class="p">(</span><span class="n">mouse_pos</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_is_clicked</span><span class="p">(</span><span class="n">mouse_pos</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                            <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+
+                            <span class="n">can_move</span><span class="p">,</span> <span class="n">possible_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_player_cannot_move</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">can_move</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                                <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_current_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                <span class="k">break</span>
+
+                            <span class="k">if</span> <span class="n">selected_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">possible_moves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">compute_possible_moves</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">,</span>
+                                                                                   <span class="n">selected_column</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_possible_moves</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="n">possible_moves</span><span class="p">)</span>
+                            <span class="k">break</span>
+
+                    <span class="c1"># this part is the main logic for the human player</span>
+                    <span class="c1"># it checks if there are dice values left</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_can_remove_piece</span><span class="p">(</span><span class="n">selected_column</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">):</span>
+                            <span class="n">can_be_removed</span> <span class="o">=</span> <span class="kc">True</span>
+
+                        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">is_clicked</span><span class="p">(</span><span class="n">mouse_pos</span><span class="p">):</span>
+
+                                <span class="k">if</span> <span class="n">selected_column</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_player</span><span class="o">.</span><span class="n">color</span> <span class="o">!=</span> \
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">color</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid move&quot;</span><span class="p">)</span>
+                                    <span class="k">break</span>
+
+                                <span class="k">if</span> <span class="n">selected_column</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid move&quot;</span><span class="p">)</span>
+                                    <span class="k">break</span>
+
+                                <span class="k">else</span><span class="p">:</span>
+
+                                    <span class="k">if</span> <span class="n">selected_column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                        <span class="n">selected_column</span> <span class="o">=</span> <span class="n">index</span>
+                                        <span class="n">possible_moves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">compute_possible_moves</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span>
+                                                                                           <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">,</span>
+                                                                                           <span class="n">selected_column</span><span class="p">)</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_possible_moves</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="n">possible_moves</span><span class="p">)</span>
+
+                                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_can_remove_piece</span><span class="p">(</span><span class="n">selected_column</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span>
+                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">):</span>
+                                            <span class="n">can_be_removed</span> <span class="o">=</span> <span class="kc">True</span>
+                                            <span class="k">break</span>
+
+                                        <span class="k">if</span> <span class="n">possible_moves</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">can_be_removed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid move&quot;</span><span class="p">)</span>
+                                            <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                            <span class="k">break</span>
+
+                                    <span class="k">elif</span> <span class="n">selected_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                        <span class="c1"># if the player can remove a piece</span>
+                                        <span class="k">if</span> <span class="n">possible_moves</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">can_be_removed</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">finish_piece</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="n">selected_column</span><span class="p">)</span>
+
+                                            <span class="n">can_move</span><span class="p">,</span> <span class="n">possible_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_player_cannot_move</span><span class="p">(</span>
+                                                <span class="n">current_player</span><span class="p">)</span>
+                                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">can_move</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                                                <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_current_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                                <span class="k">break</span>
+                                            <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+
+                                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_winner</span><span class="p">(</span><span class="n">current_player</span><span class="p">):</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">draw_winner</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+
+                                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span> <span class="o">==</span> <span class="p">[]:</span>
+                                                <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                <span class="k">break</span>
+                                            <span class="k">else</span><span class="p">:</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                                                <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+
+                                        <span class="k">elif</span> <span class="n">possible_moves</span> <span class="o">==</span> <span class="p">[]:</span>
+                                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid move&quot;</span><span class="p">)</span>
+                                            <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                            <span class="k">break</span>
+
+                                        <span class="c1"># the player can move OR finish a piece</span>
+                                        <span class="k">elif</span> <span class="n">possible_moves</span> <span class="o">!=</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">can_be_removed</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                                            <span class="c1"># move</span>
+                                            <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">possible_moves</span><span class="p">:</span>
+                                                <span class="n">possible_moves</span><span class="p">,</span> <span class="n">selected_column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_move</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span>
+                                                                                                   <span class="n">index</span><span class="p">,</span>
+                                                                                                   <span class="n">selected_column</span><span class="p">)</span>
+
+                                                <span class="n">can_move</span><span class="p">,</span> <span class="n">possible_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_player_cannot_move</span><span class="p">(</span>
+                                                    <span class="n">current_player</span><span class="p">)</span>
+                                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">can_move</span> <span class="p">:</span>
+                                                    <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_current_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                    <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                                    <span class="k">break</span>
+
+                                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_board</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                                                    <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">)</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="p">)</span>
+                                                    <span class="k">break</span>
+
+                                            <span class="c1"># finish piece</span>
+                                            <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="n">selected_column</span><span class="p">:</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">finish_piece</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="n">selected_column</span><span class="p">)</span>
+
+                                                <span class="n">can_move</span><span class="p">,</span> <span class="n">possible_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_player_cannot_move</span><span class="p">(</span>
+                                                    <span class="n">current_player</span><span class="p">)</span>
+                                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">can_move</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                                                    <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_current_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                    <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                                    <span class="k">break</span>
+                                                <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+
+                                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_winner</span><span class="p">(</span><span class="n">current_player</span><span class="p">):</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">draw_winner</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+
+                                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span> <span class="o">==</span> <span class="p">[]:</span>
+                                                    <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                    <span class="k">break</span>
+
+                                                <span class="k">else</span><span class="p">:</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+                                                    <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+
+                                        <span class="c1"># the player can only move</span>
+                                        <span class="k">elif</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">possible_moves</span><span class="p">:</span>
+                                            <span class="n">possible_moves</span><span class="p">,</span> <span class="n">selected_column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_move</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span>
+                                                                                               <span class="n">selected_column</span><span class="p">)</span>
+
+                                            <span class="n">can_move</span><span class="p">,</span> <span class="n">possible_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_player_cannot_move</span><span class="p">(</span>
+                                                <span class="n">current_player</span><span class="p">)</span>
+                                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">can_move</span><span class="p">:</span>
+                                                <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_current_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+                                                <span class="k">break</span>
+
+                                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_board</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+                                                <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">)</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="p">)</span>
+                                                <span class="k">break</span>
+
+            <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Game.reset_current_player">
+<a class="viewcode-back" href="../game.html#game.Game.reset_current_player">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset_current_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_player</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the current player. It draws the board and the pieces and resets the dice values. It also changes the</span>
+<span class="sd">        current player.</span>
+<span class="sd">        :param current_player: The current player.</span>
+<span class="sd">        :type current_player: Player</span>
+<span class="sd">        :return: The new current player.</span>
+<span class="sd">        :rtype: Player</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_player</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_board</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">current_player</span></div>
+
+
+<div class="viewcode-block" id="Game.check_if_player_cannot_move">
+<a class="viewcode-back" href="../game.html#game.Game.check_if_player_cannot_move">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_if_player_cannot_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span> <span class="n">current_column</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the player can move. If the player can move, it returns True and the possible indices. If the player</span>
+<span class="sd">        cannot move, it returns False and None. Possible indices is a list of tuples. Each tuple contains the index of</span>
+<span class="sd">        the column from which the piece can be moved and the index of the column to which the piece can be moved.</span>
+<span class="sd">        If the player can remove a piece, the first index of the tuple is 0 if the player is white and 25 if the player</span>
+<span class="sd">        is black. The second index is the index of the column from which the piece can be removed.</span>
+<span class="sd">        It checks if the player can remove a piece first. If the player cannot remove a piece, it checks if the player</span>
+<span class="sd">        can move a piece from the board. If the player cannot move a piece from the board, it checks if the player can</span>
+<span class="sd">        move a piece from the house. If the player cannot move a piece from the house, it returns False and None.</span>
+
+<span class="sd">        :param current_player: The current player.</span>
+<span class="sd">        :type current_player: Player</span>
+<span class="sd">        :param current_column: The index of the column from which the piece can be moved.</span>
+<span class="sd">        :type current_column: int</span>
+<span class="sd">        :return: True if the player can move, False otherwise. Possible indices if the player can move, None otherwise.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">can_move</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">possible_indices</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_in_house</span><span class="p">(</span><span class="n">current_player</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">current_column_is_empty</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_can_remove_piece</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">):</span>
+                            <span class="n">possible_indices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
+                            <span class="n">can_move</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">25</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">current_column_is_empty</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_can_remove_piece</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">):</span>
+                            <span class="n">possible_indices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
+                            <span class="n">can_move</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">current_column_is_empty</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">:</span>
+                    <span class="n">possible_moves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">compute_possible_moves</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">possible_moves</span> <span class="o">!=</span> <span class="p">[]:</span>
+                        <span class="n">can_move</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">for</span> <span class="n">move</span> <span class="ow">in</span> <span class="n">possible_moves</span><span class="p">:</span>
+                            <span class="n">possible_indices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">move</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">can_move</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">possible_indices</span></div>
+
+
+<div class="viewcode-block" id="Game.handle_move">
+<a class="viewcode-back" href="../game.html#game.Game.handle_move">[docs]</a>
+    <span class="k">def</span> <span class="nf">handle_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">selected_column</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles the move of the piece. It moves the piece from the selected column to the index column. It also removes</span>
+<span class="sd">        the piece if the piece is eaten. It returns the possible moves and the selected column.</span>
+<span class="sd">        :param current_player: The current player.</span>
+<span class="sd">        :type current_player: Player</span>
+<span class="sd">        :param index: The index of the column to which the piece is moved.</span>
+<span class="sd">        :type index: int</span>
+<span class="sd">        :param selected_column: The index of the column from which the piece is moved.</span>
+<span class="sd">        :type selected_column: int</span>
+<span class="sd">        :return: The possible moves and the selected column.</span>
+<span class="sd">        :rtype: tuple (list, int or None)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">removed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">move_piece</span><span class="p">(</span><span class="n">selected_column</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">selected_column</span> <span class="o">-</span> <span class="n">index</span><span class="p">))</span>
+        <span class="n">possible_moves</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">selected_column</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">removed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_player</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="o">.</span><span class="n">removed_pieces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">removed</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="o">.</span><span class="n">removed_pieces</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="o">.</span><span class="n">removed_pieces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">removed</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="o">.</span><span class="n">removed_pieces</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">possible_moves</span><span class="p">,</span> <span class="n">selected_column</span></div>
+
+
+<div class="viewcode-block" id="Game.finish_piece">
+<a class="viewcode-back" href="../game.html#game.Game.finish_piece">[docs]</a>
+    <span class="k">def</span> <span class="nf">finish_piece</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span> <span class="n">selected_column</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finishes the piece. It removes the piece from the house, from the selected column and updates the dice values.</span>
+<span class="sd">        It also draws the board and the pieces.</span>
+
+<span class="sd">        :param current_player: The player that finished the piece.</span>
+<span class="sd">        :type current_player: Player</span>
+<span class="sd">        :param selected_column: The index of the column from which the piece is removed.</span>
+<span class="sd">        :type selected_column: int</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_player</span><span class="o">.</span><span class="n">finished_pieces</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">selected_column</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_board</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">draw_removed_pieces</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">selected_column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">selected_column</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="mi">25</span> <span class="o">-</span> <span class="n">selected_column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="mi">25</span> <span class="o">-</span> <span class="n">selected_column</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Game.change_player">
+<a class="viewcode-back" href="../game.html#game.Game.change_player">[docs]</a>
+    <span class="k">def</span> <span class="nf">change_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_player</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Changes the current player.</span>
+<span class="sd">        :param current_player: The current player.</span>
+<span class="sd">        :type current_player: Player</span>
+<span class="sd">        :return: The new current player.</span>
+<span class="sd">        :rtype: Player</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">current_player</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span><span class="p">:</span>
+            <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">current_player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player1</span>
+        <span class="k">return</span> <span class="n">current_player</span></div>
+
+
+<div class="viewcode-block" id="Game.draw_text">
+<a class="viewcode-back" href="../game.html#game.Game.draw_text">[docs]</a>
+    <span class="k">def</span> <span class="nf">draw_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">txt_font</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draws the text on the screen.</span>
+<span class="sd">        :param text: The text to be drawn.</span>
+<span class="sd">        :type text: str</span>
+<span class="sd">        :param x: The x coordinate of the text.</span>
+<span class="sd">        :type x: int</span>
+<span class="sd">        :param y: The y coordinate of the text.</span>
+<span class="sd">        :type y: int</span>
+<span class="sd">        :param color: The color of the text.</span>
+<span class="sd">        :type color: tuple</span>
+<span class="sd">        :param txt_font: The font of the text.</span>
+<span class="sd">        :type txt_font: pygame.font.Font</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text_surface</span> <span class="o">=</span> <span class="n">txt_font</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="n">text_surface</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Game.mode_selection">
+<a class="viewcode-back" href="../game.html#game.Game.mode_selection">[docs]</a>
+    <span class="k">def</span> <span class="nf">mode_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The mode selection loop. It draws the mode selection menu and handles the user&#39;s clicks. It returns the next</span>
+<span class="sd">        state of the game (the actual game) and the selected mode.</span>
+<span class="sd">        :return: The next state of the game and the selected mode.</span>
+<span class="sd">        :rtype: tuple (str, str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rect_width</span><span class="p">,</span> <span class="n">rect_height</span> <span class="o">=</span> <span class="mi">780</span><span class="p">,</span> <span class="mi">500</span>
+        <span class="n">transparent_surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="n">rect_width</span><span class="p">,</span> <span class="n">rect_height</span><span class="p">),</span> <span class="n">pygame</span><span class="o">.</span><span class="n">SRCALPHA</span><span class="p">)</span>
+        <span class="n">transparent_surface</span><span class="o">.</span><span class="n">fill</span><span class="p">((</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">150</span><span class="p">))</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_background</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="n">transparent_surface</span><span class="p">,</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">400</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">4</span> <span class="o">-</span> <span class="mi">50</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="s2">&quot;Select Game Mode&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">330</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span>
+                           <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_font</span><span class="p">)</span>
+
+            <span class="n">pvp_button</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">130</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">270</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="n">pygame</span><span class="o">.</span><span class="n">draw</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">pvp_button</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="s2">&quot;Player vs Player&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">90</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">17</span><span class="p">,</span>
+                           <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">)</span>
+
+            <span class="n">pvc_button</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">130</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">270</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="n">pygame</span><span class="o">.</span><span class="n">draw</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">pvc_button</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="s2">&quot;Player vs Computer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">111</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">45</span><span class="p">,</span>
+                           <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">)</span>
+
+            <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pygame</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">QUIT</span><span class="p">:</span>
+                    <span class="n">pygame</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">MOUSEBUTTONDOWN</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pvp_button</span><span class="o">.</span><span class="n">collidepoint</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="s2">&quot;game_play&quot;</span><span class="p">,</span> <span class="s2">&quot;pvp&quot;</span>
+                    <span class="k">elif</span> <span class="n">pvc_button</span><span class="o">.</span><span class="n">collidepoint</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="s2">&quot;game_play&quot;</span><span class="p">,</span> <span class="s2">&quot;pvc&quot;</span></div>
+
+
+<div class="viewcode-block" id="Game.draw_roll_dice_button">
+<a class="viewcode-back" href="../game.html#game.Game.draw_roll_dice_button">[docs]</a>
+    <span class="k">def</span> <span class="nf">draw_roll_dice_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_color</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draws the roll dice button.</span>
+<span class="sd">        :param player_color: The color of the player.</span>
+<span class="sd">        :type player_color: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../assets/roll-dice.png&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button</span><span class="o">.</span><span class="n">get_rect</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">player_color</span> <span class="o">==</span> <span class="s2">&quot;black&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1700</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span><span class="o">.</span><span class="n">y</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Game.roll_dice_button_is_clicked">
+<a class="viewcode-back" href="../game.html#game.Game.roll_dice_button_is_clicked">[docs]</a>
+    <span class="k">def</span> <span class="nf">roll_dice_button_is_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mouse_pos</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the roll dice button is clicked.</span>
+<span class="sd">        :param mouse_pos: The position of the mouse.</span>
+<span class="sd">        :type mouse_pos: tuple</span>
+<span class="sd">        :return: True if the roll dice button is clicked, False otherwise.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_dice_button_rect</span><span class="o">.</span><span class="n">collidepoint</span><span class="p">(</span><span class="n">mouse_pos</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Game.roll_dice">
+<a class="viewcode-back" href="../game.html#game.Game.roll_dice">[docs]</a>
+    <span class="k">def</span> <span class="nf">roll_dice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_color</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rolls the dice and updates the dice values. It also draws the dice.</span>
+<span class="sd">        :param player_color: The color of the player.</span>
+<span class="sd">        :type player_color: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">roll</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">value</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dice_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_dice</span><span class="p">(</span><span class="n">player_color</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Game.draw_dice">
+<a class="viewcode-back" href="../game.html#game.Game.draw_dice">[docs]</a>
+    <span class="k">def</span> <span class="nf">draw_dice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_color</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draws the dice.</span>
+<span class="sd">        :param player_color: The color of the player.</span>
+<span class="sd">        :type player_color: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">player_color</span> <span class="o">==</span> <span class="s2">&quot;black&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1700</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1800</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">200</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">face</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">face</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">face</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice1</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">blit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">face</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice2</span><span class="o">.</span><span class="n">dice_rect</span><span class="o">.</span><span class="n">y</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Game.all_in_house">
+<a class="viewcode-back" href="../game.html#game.Game.all_in_house">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_in_house</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if all the pieces of the player are in the house. It checks if all the pieces of the same color are in</span>
+<span class="sd">        their home.</span>
+<span class="sd">        False.</span>
+<span class="sd">        :param player: The player.</span>
+<span class="sd">        :type player: Player</span>
+<span class="sd">        :return: True if all the pieces of the player are in the house, False otherwise.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">24</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">column_stack</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">column</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">19</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">column_stack</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">column</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;black&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">player</span><span class="o">.</span><span class="n">removed_pieces</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Game.check_if_can_remove_piece">
+<a class="viewcode-back" href="../game.html#game.Game.check_if_can_remove_piece">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_if_can_remove_piece</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_column</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">dice_values</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the player can remove a piece from the board.</span>
+<span class="sd">        It checks if all pieces are in house. It checks if the current column has a piece that can be removed.</span>
+<span class="sd">        It also checks the case when on the column corresponding to the dice is empty and the player has pieces on the</span>
+<span class="sd">        columns after the dice, it can remove the one that is after.</span>
+
+<span class="sd">        :param current_column: The index of the column from which the piece can be removed.</span>
+<span class="sd">        :type current_column: int</span>
+<span class="sd">        :param player: The player.</span>
+<span class="sd">        :type player: Player</span>
+<span class="sd">        :param dice_values: The values of the dice.</span>
+<span class="sd">        :type dice_values: list</span>
+<span class="sd">        :return: True if the player can remove a piece, False otherwise.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">can_remove</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">current_column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">dice</span> <span class="ow">in</span> <span class="n">dice_values</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_in_house</span><span class="p">(</span><span class="n">player</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">current_column</span> <span class="o">==</span> <span class="n">dice</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">current_column_is_empty</span><span class="p">(</span><span class="n">dice</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">dice</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">dice</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">return</span> <span class="kc">True</span>
+                    <span class="k">elif</span> <span class="n">current_column</span> <span class="o">&lt;</span> <span class="n">dice</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">current_column</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">current_column_is_empty</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">!=</span> <span class="s2">&quot;black&quot;</span><span class="p">:</span>
+                                    <span class="n">can_remove</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">if</span> <span class="n">can_remove</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">can_remove</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">current_column</span> <span class="o">==</span> <span class="mi">25</span> <span class="o">-</span> <span class="n">dice</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">current_column_is_empty</span><span class="p">(</span><span class="mi">25</span> <span class="o">-</span> <span class="n">dice</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">25</span> <span class="o">-</span> <span class="n">dice</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="s2">&quot;black&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">25</span> <span class="o">-</span> <span class="n">dice</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">return</span> <span class="kc">True</span>
+                    <span class="k">elif</span> <span class="n">current_column</span> <span class="o">&gt;</span> <span class="mi">25</span> <span class="o">-</span> <span class="n">dice</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="n">current_column</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">current_column_is_empty</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">column_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">!=</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
+                                    <span class="n">can_remove</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">if</span> <span class="n">can_remove</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">can_remove</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Game.is_winner">
+<a class="viewcode-back" href="../game.html#game.Game.is_winner">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the player is the winner.</span>
+<span class="sd">        :param player: The player.</span>
+<span class="sd">        :type player: Player</span>
+<span class="sd">        :return: True if the player is the winner, False otherwise.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">finished_pieces</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Game.draw_winner">
+<a class="viewcode-back" href="../game.html#game.Game.draw_winner">[docs]</a>
+    <span class="k">def</span> <span class="nf">draw_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draws the winner on the screen.</span>
+<span class="sd">        :param player: The player that won</span>
+<span class="sd">        :type player: Player</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">8</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">pygame</span><span class="o">.</span><span class="n">draw</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">rect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">player</span><span class="o">.</span><span class="n">color</span><span class="si">}</span><span class="s2"> player won!&quot;</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">160</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">80</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_font</span><span class="p">)</span>
+        <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">pygame</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stirbu Larisa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
