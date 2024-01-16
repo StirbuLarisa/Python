@@ -56,6 +56,12 @@ class Game:
         self.menu_background = pygame.image.load("../assets/wallpaper_menu.jpg")
 
     def init_game(self, mode):
+        """
+        Initializes the game. It chose the type of the second player based on the mode. It also initializes the board.
+        :param mode: The mode of the game. It can be either "pvp" (2 players) or "pvc" (player vs computer).
+        :type mode: str
+        :return: None
+        """
         self.board.init_board(self.screen)
         self.player1 = Player("human", "white")
         if mode == "pvp":
@@ -64,6 +70,14 @@ class Game:
             self.player2 = Player("pc", "black")
 
     def main_menu(self):
+        """
+        The main menu loop. It draws the main menu and handles the user's clicks. It returns the next state of the game.
+        The player can choose to play the game or to quit the game. If the player chooses to play the game, the game
+        will enter the mode selection loop, where the player can choose the game mode.
+
+        :return: The next state of the game.
+        :rtype: str
+        """
         rect_width, rect_height = 550, 500
         transparent_surface = pygame.Surface((rect_width, rect_height), pygame.SRCALPHA)
         transparent_surface.fill((255, 255, 255, 150))
@@ -97,22 +111,33 @@ class Game:
                 pygame.display.flip()
 
     def play(self):
+        """
+        The game loop. It draws the board, the pieces and the removed pieces. It has the logic for both human and
+        computer players. It also handles the player's clicks.
+        It checks if the player can move. If the player cannot move, it changes the current player.
+        It checks if the player can put a piece back on board. If not, it changes the current player.
+        It checks if the player is the winner. If the player is the winner, it draws the winner.
+        In case of a computer player it rolls the dice, computes all possible moves and chooses a random move.
+
+        :return:
+        """
         current_player = self.player1
         selected_column = None
         possible_moves = []
 
         while True:
             for event in pygame.event.get():
+
                 can_be_removed = False
                 if len(self.dice_values) == 0:
                     self.draw_roll_dice_button(current_player.color)
 
+                # this part is the logic for the computer player
                 if current_player.type == "pc":
                     self.roll_dice(current_player.color)
                     pygame.time.delay(1000)
                     self.draw_dice(current_player.color)
                     pygame.display.flip()
-                    print(self.dice_values)
 
                     while self.dice_values:
                         print(self.dice_values)
@@ -131,8 +156,8 @@ class Game:
                             continue
 
                         can_move, possible_indices = self.check_if_player_cannot_move(current_player)
-                        print(possible_indices)
-                        if can_move == False:
+
+                        if not can_move:
                             current_player = self.reset_current_player(current_player)
                             break
 
@@ -158,6 +183,8 @@ class Game:
                     current_player = self.reset_current_player(current_player)
                     break
 
+                # this part is the logic for the human player
+                # it checks if the player can go back on board
                 if current_player.removed_pieces != [] and selected_column is None:
                     if current_player.color == "white":
                         selected_column = 25
@@ -170,11 +197,11 @@ class Game:
                         print(possible_moves)
                         self.board.draw_possible_moves(self.screen, possible_moves)
 
+                # the eaten piece cannot be put back on board and the player has to change
                 if not possible_moves and len(self.dice_values) != 0 and current_player.removed_pieces != []:
-                    print("schimbam jucatorul cand are piesa removed blocata")
                     self.draw_dice(current_player.color)
-                    time.sleep(3)
-
+                    pygame.display.flip()
+                    time.sleep(2)
                     current_player = self.change_player(current_player)
                     self.board.draw_board(self.screen)
                     self.board.draw_pieces(self.screen)
@@ -195,7 +222,7 @@ class Game:
                         if len(self.dice_values) == 0:
                             self.roll_dice(current_player.color)
                             self.draw_dice(current_player.color)
-                            print(self.dice_values)
+                            pygame.display.flip()
 
                             can_move, possible_indices = self.check_if_player_cannot_move(current_player)
                             if can_move == False:
@@ -210,10 +237,12 @@ class Game:
                                 self.board.draw_possible_moves(self.screen, possible_moves)
                             break
 
+                    # this part is the main logic for the human player
+                    # it checks if there are dice values left
                     elif len(self.dice_values) != 0:
+
                         if self.check_if_can_remove_piece(selected_column, current_player, self.dice_values):
                             can_be_removed = True
-                            print(can_be_removed)
 
                         for index in range(1, len(self.board.columns) - 1):
 
@@ -236,13 +265,11 @@ class Game:
                                         possible_moves = self.board.compute_possible_moves(current_player,
                                                                                            self.dice_values,
                                                                                            selected_column)
-                                        print(possible_moves)
                                         self.board.draw_possible_moves(self.screen, possible_moves)
 
                                         if self.check_if_can_remove_piece(selected_column, current_player,
                                                                           self.dice_values):
                                             can_be_removed = True
-                                            print(can_be_removed)
                                             break
 
                                         if possible_moves == [] and can_be_removed is False:
@@ -251,9 +278,9 @@ class Game:
                                             break
 
                                     elif selected_column is not None:
-                                        print(f" inainte de finish {can_be_removed}")
+                                        # if the player can remove a piece
                                         if possible_moves == [] and can_be_removed is True:
-                                            print("finish piece")
+
                                             self.finish_piece(current_player, selected_column)
 
                                             can_move, possible_indices = self.check_if_player_cannot_move(
@@ -272,23 +299,24 @@ class Game:
                                                 break
                                             else:
                                                 self.draw_dice(current_player.color)
+                                                pygame.display.flip()
 
                                         elif possible_moves == []:
                                             print("Invalid move")
                                             selected_column = None
                                             break
 
+                                        # the player can move OR finish a piece
                                         elif possible_moves != [] and can_be_removed is True:
-                                            print("poate sa le faca pe amandoua")
+                                            # move
                                             if index in possible_moves:
-                                                print("in move")
                                                 possible_moves, selected_column = self.handle_move(current_player,
                                                                                                    index,
                                                                                                    selected_column)
 
                                                 can_move, possible_indices = self.check_if_player_cannot_move(
                                                     current_player)
-                                                if len(self.dice_values) != 0 and can_move == False:
+                                                if len(self.dice_values) != 0 and not can_move :
                                                     current_player = self.reset_current_player(current_player)
                                                     selected_column = None
                                                     break
@@ -301,8 +329,8 @@ class Game:
                                                     self.board.draw_removed_pieces(self.screen, self.player2)
                                                     break
 
+                                            # finish piece
                                             elif index == selected_column:
-                                                print("finish piece")
                                                 self.finish_piece(current_player, selected_column)
 
                                                 can_move, possible_indices = self.check_if_player_cannot_move(
@@ -322,15 +350,16 @@ class Game:
 
                                                 else:
                                                     self.draw_dice(current_player.color)
+                                                    pygame.display.flip()
 
+                                        # the player can only move
                                         elif index in possible_moves:
-                                            print("in move")
                                             possible_moves, selected_column = self.handle_move(current_player, index,
                                                                                                selected_column)
 
                                             can_move, possible_indices = self.check_if_player_cannot_move(
                                                 current_player)
-                                            if len(self.dice_values) != 0 and can_move == False:
+                                            if len(self.dice_values) != 0 and not can_move:
                                                 current_player = self.reset_current_player(current_player)
                                                 selected_column = None
                                                 break
@@ -346,6 +375,14 @@ class Game:
             pygame.display.flip()
 
     def reset_current_player(self, current_player):
+        """
+        Resets the current player. It draws the board and the pieces and resets the dice values. It also changes the
+        current player.
+        :param current_player: The current player.
+        :type current_player: Player
+        :return: The new current player.
+        :rtype: Player
+        """
         time.sleep(3)
         current_player = self.change_player(current_player)
         self.board.draw_board(self.screen)
@@ -356,6 +393,23 @@ class Game:
         return current_player
 
     def check_if_player_cannot_move(self, current_player, current_column=None):
+        """
+        Checks if the player can move. If the player can move, it returns True and the possible indices. If the player
+        cannot move, it returns False and None. Possible indices is a list of tuples. Each tuple contains the index of
+        the column from which the piece can be moved and the index of the column to which the piece can be moved.
+        If the player can remove a piece, the first index of the tuple is 0 if the player is white and 25 if the player
+        is black. The second index is the index of the column from which the piece can be removed.
+        It checks if the player can remove a piece first. If the player cannot remove a piece, it checks if the player
+        can move a piece from the board. If the player cannot move a piece from the board, it checks if the player can
+        move a piece from the house. If the player cannot move a piece from the house, it returns False and None.
+
+        :param current_player: The current player.
+        :type current_player: Player
+        :param current_column: The index of the column from which the piece can be moved.
+        :type current_column: int
+        :return: True if the player can move, False otherwise. Possible indices if the player can move, None otherwise.
+        :rtype: tuple
+        """
         can_move = False
         possible_indices = []
 
@@ -388,6 +442,18 @@ class Game:
             return True, possible_indices
 
     def handle_move(self, current_player, index, selected_column):
+        """
+        Handles the move of the piece. It moves the piece from the selected column to the index column. It also removes
+        the piece if the piece is eaten. It returns the possible moves and the selected column.
+        :param current_player: The current player.
+        :type current_player: Player
+        :param index: The index of the column to which the piece is moved.
+        :type index: int
+        :param selected_column: The index of the column from which the piece is moved.
+        :type selected_column: int
+        :return: The possible moves and the selected column.
+        :rtype: tuple (list, int or None)
+        """
         removed = self.board.move_piece(selected_column, index, self.screen)
         self.draw_dice(current_player.color)
         self.dice_values.remove(abs(selected_column - index))
@@ -407,6 +473,16 @@ class Game:
         return possible_moves, selected_column
 
     def finish_piece(self, current_player, selected_column):
+        """
+        Finishes the piece. It removes the piece from the house, from the selected column and updates the dice values.
+        It also draws the board and the pieces.
+
+        :param current_player: The player that finished the piece.
+        :type current_player: Player
+        :param selected_column: The index of the column from which the piece is removed.
+        :type selected_column: int
+        :return: None
+        """
         current_player.finished_pieces += 1
         self.board.columns[selected_column].column_stack.pop()
         self.board.draw_board(self.screen)
@@ -425,6 +501,13 @@ class Game:
                 self.dice_values.remove(max(self.dice_values))
 
     def change_player(self, current_player):
+        """
+        Changes the current player.
+        :param current_player: The current player.
+        :type current_player: Player
+        :return: The new current player.
+        :rtype: Player
+        """
         if current_player == self.player1:
             current_player = self.player2
         else:
@@ -432,10 +515,30 @@ class Game:
         return current_player
 
     def draw_text(self, text, x, y, color, txt_font):
+        """
+        Draws the text on the screen.
+        :param text: The text to be drawn.
+        :type text: str
+        :param x: The x coordinate of the text.
+        :type x: int
+        :param y: The y coordinate of the text.
+        :type y: int
+        :param color: The color of the text.
+        :type color: tuple
+        :param txt_font: The font of the text.
+        :type txt_font: pygame.font.Font
+        :return: None
+        """
         text_surface = txt_font.render(text, True, color)
         self.screen.blit(text_surface, (x, y))
 
     def mode_selection(self):
+        """
+        The mode selection loop. It draws the mode selection menu and handles the user's clicks. It returns the next
+        state of the game (the actual game) and the selected mode.
+        :return: The next state of the game and the selected mode.
+        :rtype: tuple (str, str)
+        """
         rect_width, rect_height = 780, 500
         transparent_surface = pygame.Surface((rect_width, rect_height), pygame.SRCALPHA)
         transparent_surface.fill((255, 255, 255, 150))
@@ -469,6 +572,12 @@ class Game:
                         return "game_play", "pvc"
 
     def draw_roll_dice_button(self, player_color):
+        """
+        Draws the roll dice button.
+        :param player_color: The color of the player.
+        :type player_color: str
+        :return: None
+        """
 
         self.roll_dice_button = pygame.image.load("../assets/roll-dice.png")
         self.roll_dice_button_rect = self.roll_dice_button.get_rect()
@@ -480,10 +589,22 @@ class Game:
         self.screen.blit(self.roll_dice_button, (self.roll_dice_button_rect.x, self.roll_dice_button_rect.y))
 
     def roll_dice_button_is_clicked(self, mouse_pos):
+        """
+        Checks if the roll dice button is clicked.
+        :param mouse_pos: The position of the mouse.
+        :type mouse_pos: tuple
+        :return: True if the roll dice button is clicked, False otherwise.
+        :rtype: bool
+        """
         return self.roll_dice_button_rect.collidepoint(mouse_pos)
 
     def roll_dice(self, player_color):
-
+        """
+        Rolls the dice and updates the dice values. It also draws the dice.
+        :param player_color: The color of the player.
+        :type player_color: str
+        :return: None
+        """
         self.dice1.roll()
         self.dice2.roll()
         if self.dice1.value == self.dice2.value:
@@ -494,6 +615,12 @@ class Game:
         self.draw_dice(player_color)
 
     def draw_dice(self, player_color):
+        """
+        Draws the dice.
+        :param player_color: The color of the player.
+        :type player_color: str
+        :return: None
+        """
 
         if player_color == "black":
             self.dice1.dice_rect.x = 1700
@@ -509,6 +636,15 @@ class Game:
         self.screen.blit(self.dice2.face, (self.dice2.dice_rect.x, self.dice2.dice_rect.y))
 
     def all_in_house(self, player):
+        """
+        Checks if all the pieces of the player are in the house. It checks if all the pieces of the same color are in
+        their home.
+        False.
+        :param player: The player.
+        :type player: Player
+        :return: True if all the pieces of the player are in the house, False otherwise.
+        :rtype: bool
+        """
         if player.color == "white":
             for column in self.board.columns[7:24]:
                 if len(column.column_stack) != 0 and column.column_stack[-1].color == "white":
@@ -523,6 +659,21 @@ class Game:
             return False
 
     def check_if_can_remove_piece(self, current_column, player, dice_values):
+        """
+        Checks if the player can remove a piece from the board.
+        It checks if all pieces are in house. It checks if the current column has a piece that can be removed.
+        It also checks the case when on the column corresponding to the dice is empty and the player has pieces on the
+        columns after the dice, it can remove the one that is after.
+
+        :param current_column: The index of the column from which the piece can be removed.
+        :type current_column: int
+        :param player: The player.
+        :type player: Player
+        :param dice_values: The values of the dice.
+        :type dice_values: list
+        :return: True if the player can remove a piece, False otherwise.
+        :rtype: bool
+        """
         print(current_column)
         can_remove = True
         if current_column is None:
@@ -558,12 +709,25 @@ class Game:
         return False
 
     def is_winner(self, player):
+        """
+        Checks if the player is the winner.
+        :param player: The player.
+        :type player: Player
+        :return: True if the player is the winner, False otherwise.
+        :rtype: bool
+        """
         if player.finished_pieces == 15:
             return True
         else:
             return False
 
     def draw_winner(self, player):
+        """
+        Draws the winner on the screen.
+        :param player: The player that won
+        :type player: Player
+        :return: None
+        """
         rect = pygame.Rect(self.screen.get_width() / 2 - self.screen.get_width() / 4,
                            self.screen.get_height() / 2 - self.screen.get_height() / 8, self.screen.get_width() / 2,
                            self.screen.get_height() / 4)

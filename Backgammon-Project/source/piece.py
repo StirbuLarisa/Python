@@ -1,7 +1,7 @@
 import pygame
 
-class Piece:
 
+class Piece:
     """
     A piece is a checker that is placed on the board.
     It has the color of the player that it belongs to.
@@ -14,6 +14,7 @@ class Piece:
     :vartype bounds: pygame.Rect
 
     """
+
     def __init__(self, color):
         self.color = color
         img = pygame.image.load(f"../assets/{self.color}-piece.png")

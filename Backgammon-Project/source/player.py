@@ -1,4 +1,5 @@
 
+
 class Player:
 
     """
@@ -8,6 +9,12 @@ class Player:
     :vartype type: str
     :ivar color: The color of the player. It can be either "white" or "black".
     :vartype color: str
+    :ivar removed_pieces: The pieces that the player have been eaten from the board.
+    :vartype removed_pieces: list
+    :ivar home_pieces: The number of pieces that the player have in their home.
+    :vartype home_pieces: int
+    :ivar finished_pieces: The number of pieces that the player have finished.
+    :vartype finished_pieces: int
 
     """
     def __init__(self, type, color):

@@ -39,13 +39,12 @@ class Column:
             index += 1
 
     def is_clicked(self, mouse_pos):
-        '''
-
+        """
         Checks if the column is clicked.
         :param mouse_pos: The position of the mouse.
         :type mouse_pos: tuple
         :return: True if the column is clicked, False otherwise.
         :rtype: bool
 
-        '''
+        """
         return self.bounds.collidepoint(mouse_pos)
