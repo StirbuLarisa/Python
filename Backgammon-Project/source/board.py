@@ -141,12 +141,6 @@ class Board:
         self.draw_board(screen)
         self.assign_columns()
 
-        var = None
-        print(var)
-
-        for index in range(len(self.columns)):
-            print(f"Column {index} has {self.columns[index].bounds} bounds")
-
         self.columns[1].column_stack.extend([Piece("black"), Piece("black")])
         self.columns[1].update_piece_bounds(1)
         self.columns[12].column_stack.extend([Piece("black"), Piece("black"), Piece("black"), Piece("black")

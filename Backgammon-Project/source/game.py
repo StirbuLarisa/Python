@@ -140,7 +140,6 @@ class Game:
                     pygame.display.flip()
 
                     while self.dice_values:
-                        print(self.dice_values)
 
                         if current_player.removed_pieces:
                             selected_column = 0
@@ -194,7 +193,6 @@ class Game:
                     if self.dice_values != []:
                         possible_moves = self.board.compute_possible_moves(current_player, self.dice_values,
                                                                            selected_column)
-                        print(possible_moves)
                         self.board.draw_possible_moves(self.screen, possible_moves)
 
                 # the eaten piece cannot be put back on board and the player has to change
@@ -233,7 +231,6 @@ class Game:
                             if selected_column is not None:
                                 possible_moves = self.board.compute_possible_moves(current_player, self.dice_values,
                                                                                    selected_column)
-                                print(possible_moves)
                                 self.board.draw_possible_moves(self.screen, possible_moves)
                             break
 
@@ -674,7 +671,6 @@ class Game:
         :return: True if the player can remove a piece, False otherwise.
         :rtype: bool
         """
-        print(current_column)
         can_remove = True
         if current_column is None:
             return False
